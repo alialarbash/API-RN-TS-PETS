@@ -1,4 +1,6 @@
 import { createPet } from "@/api/pets";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -16,22 +18,35 @@ interface AddPetModalProps {
   visible: boolean;
   onClose: () => void;
   onAdd: (pet: Pet) => void;
+  refetchPets: () => void;
 }
 
 export const AddPetModal: React.FC<AddPetModalProps> = ({
   visible,
   onClose,
   onAdd,
+  refetchPets,
 }) => {
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [adopted, setAdopted] = useState("");
   const [image, setImage] = useState("");
+  const router = useRouter();
+
+  const { mutate } = useMutation({
+    mutationKey: ["createPet"],
+    mutationFn: (pet: Pet) =>
+      createPet(pet.name, pet.type, pet.adopted, pet.image),
+    onSuccess: () => {
+      refetchPets();
+    },
+  });
 
   const handleAdd = async () => {
     if (name.trim() && type.trim()) {
       const maxId = Date.now(); // Generate unique ID using rtimestamp
-      const newPet = await createPet(name, type, adopted, image);
+      mutate({ id: maxId, name, type, adopted, image });
+      // const newPet = await createPet(name, type, adopted, image);
       onAdd({
         id: maxId,
         name: name.trim(),
@@ -46,6 +61,7 @@ export const AddPetModal: React.FC<AddPetModalProps> = ({
       setType("");
       setAdopted("");
       setImage("");
+      router.replace("/");
       onClose();
     }
   };

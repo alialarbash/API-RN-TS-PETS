@@ -1,5 +1,5 @@
 import { deletePet, getPetById } from "@/api/pets";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
 import {
@@ -15,6 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function PetDetails() {
   const { id } = useLocalSearchParams();
   // const [pet, setPet] = useState<Pet | null>(null);
+  const queryClient = useQueryClient();
 
   const { data: pet } = useQuery({
     queryKey: ["getPetById", id],
@@ -26,8 +27,17 @@ export default function PetDetails() {
     // setPet(petData);
   };
 
+  const { mutate } = useMutation({
+    mutationKey: ["deletePetById"],
+    mutationFn: (id: string) => deletePet(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allPets"] });
+    },
+  });
+
   const handleDeletePetById = async (id: string) => {
-    await deletePet(id);
+    // await deletePet(id);
+    mutate(id);
     router.dismissAll();
     router.replace("/");
   };

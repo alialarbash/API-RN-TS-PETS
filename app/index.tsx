@@ -36,7 +36,7 @@ export default function Index() {
   //   };
   //   fetchPets();
   // }, []);
-  const { data, isPending } = useQuery({
+  const { data, isPending, refetch } = useQuery({
     queryKey: ["allPets"],
     queryFn: getAllPets,
   });
@@ -89,6 +89,7 @@ export default function Index() {
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
           onAdd={handleAddPet}
+          refetchPets={refetch}
         />
       </SafeAreaView>
     </>
