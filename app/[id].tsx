@@ -1,7 +1,7 @@
-import { getPetById } from "@/api/pets";
-import { Pet } from "@/data/pets";
-import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { deletePet, getPetById } from "@/api/pets";
+import { useQuery } from "@tanstack/react-query";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect } from "react";
 import {
   Image,
   ScrollView,
@@ -14,11 +14,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PetDetails() {
   const { id } = useLocalSearchParams();
-  const [pet, setPet] = useState<Pet | null>(null);
+  // const [pet, setPet] = useState<Pet | null>(null);
+
+  const { data: pet } = useQuery({
+    queryKey: ["getPetById", id],
+    queryFn: () => getPetById(id as string),
+  });
 
   const handleGetPetById = async () => {
     const petData = await getPetById(id as string);
-    setPet(petData);
+    // setPet(petData);
+  };
+
+  const handleDeletePetById = async (id: string) => {
+    await deletePet(id);
+    router.dismissAll();
+    router.replace("/");
   };
 
   // const pet = pets.find((p) => p.id === Number(id));
@@ -81,6 +92,14 @@ export default function PetDetails() {
             </Text>
           </View>
         </View>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => {
+            handleDeletePetById(id as string);
+          }}
+        >
+          <Text style={styles.deleteButtonText}>Delete Pet</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -170,5 +189,18 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 18,
     color: "#666",
+  },
+  deleteButton: {
+    backgroundColor: "#FF0033",
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginHorizontal: 20,
+    marginTop: 16,
+  },
+  deleteButtonText: {
+    color: "#fff",
+    fontSize: 22,
+    fontWeight: "600",
+    textAlign: "center",
   },
 });

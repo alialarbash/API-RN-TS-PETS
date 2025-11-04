@@ -1,30 +1,34 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
+  const queryClient = new QueryClient();
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: "#6200EE",
-        },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontWeight: "bold",
-        },
-      }}
-    >
-      <Stack.Screen
-        name="index"
-        options={{
-          title: "My Pets",
+    <QueryClientProvider client={queryClient}>
+      <Stack
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: "#6200EE",
+          },
+          headerTintColor: "#fff",
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
         }}
-      />
-      <Stack.Screen
-        name="[id]"
-        options={{
-          title: "Pet Details",
-        }}
-      />
-    </Stack>
+      >
+        <Stack.Screen
+          name="index"
+          options={{
+            title: "My Pets",
+          }}
+        />
+        <Stack.Screen
+          name="[id]"
+          options={{
+            title: "Pet Details",
+          }}
+        />
+      </Stack>
+    </QueryClientProvider>
   );
 }

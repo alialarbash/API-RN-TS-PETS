@@ -10,4 +10,23 @@ const getPetById = async (id: string) => {
   return response.data;
 };
 
-export { getAllPets, getPetById };
+const createPet = async (
+  name: string,
+  type: string,
+  adopted: string,
+  image: string
+) => {
+  const response = await petsApi.post("/pets", {
+    name, // name: name,
+    type: type,
+    adopted: adopted,
+    image: image,
+  });
+  return response.data;
+};
+
+const deletePet = async (id: string) => {
+  const response = await petsApi.delete(`/pets/${id}`);
+  return response.data;
+};
+export { createPet, getAllPets, getPetById, deletePet };

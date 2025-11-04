@@ -1,3 +1,4 @@
+import { createPet } from "@/api/pets";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -27,15 +28,18 @@ export const AddPetModal: React.FC<AddPetModalProps> = ({
   const [adopted, setAdopted] = useState("");
   const [image, setImage] = useState("");
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (name.trim() && type.trim()) {
       const maxId = Date.now(); // Generate unique ID using rtimestamp
+      const newPet = await createPet(name, type, adopted, image);
       onAdd({
         id: maxId,
         name: name.trim(),
         type: type.trim(),
         adopted: adopted.trim() || "No",
-        image: image.trim() || "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=400&h=400&fit=crop",
+        image:
+          image.trim() ||
+          "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=400&h=400&fit=crop",
       });
       // Reset form
       setName("");
@@ -216,4 +220,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-

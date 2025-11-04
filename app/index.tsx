@@ -1,7 +1,9 @@
 import { getAllPets } from "@/api/pets";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -22,9 +24,30 @@ export default function Index() {
     router.push(`/${id}`);
   };
 
-  const handleAddPet = (newPet: Pet) => {
+  const handleAddPet = async (newPet: Pet) => {
     setPets([newPet, ...pets]);
+
+    setPets([...(await getAllPets())]);
   };
+
+  // useEffect(() => {
+  //   const fetchPets = async () => {
+  //     setPets([...(await getAllPets())]);
+  //   };
+  //   fetchPets();
+  // }, []);
+  const { data, isPending } = useQuery({
+    queryKey: ["allPets"],
+    queryFn: getAllPets,
+  });
+
+  if (isPending) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#6200EE" />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -37,7 +60,8 @@ export default function Index() {
 
       <TouchableOpacity
         onPress={async () => {
-          setPets([...(await getAllPets()), ...pets]);
+          // setPets([...(await getAllPets()), ...pets]);
+          setPets([...(await getAllPets())]);
         }}
         style={styles.headerButton}
       >
@@ -52,7 +76,7 @@ export default function Index() {
               <Text style={styles.emptySubtext}>Start by adding a new pet</Text>
             </View>
           ) : (
-            pets.map((pet) => (
+            data?.map((pet: Pet) => (
               <PetCard
                 key={pet.id}
                 pet={pet}
@@ -78,6 +102,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
+    flexDirection: "column-reverse",
   },
   emptyContainer: {
     flex: 1,
